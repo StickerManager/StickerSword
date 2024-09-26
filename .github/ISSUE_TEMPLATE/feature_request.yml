@@ -1,0 +1,40 @@
+name: 功能请求 / Feature request
+description: 提出你想要的功能。 / Feature request.
+labels: [ Feature ]
+title: "[Feature] "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for submitting a feature request! Please fill out the following information to help us understand your needs better.
+
+  - type: input
+    attributes:
+      label: 作用域 APP 与版本 / Scope APP and Version
+      description: |
+        Please enter the version of the scope APP you need. For example: **QQ 8.9.28**, **WeChat 8.0.30**
+        If there are multiple scope APPs, please use commas to separate them and fill them in order
+    validations:
+      required: true
+
+  - type: textarea
+    id: why
+    attributes:
+      label: 为什么你认为需要此功能 / Why do you think this feature is needed
+    validations:
+      required: true
+
+  - type: textarea
+    id: related-feature
+    attributes:
+      label: 联系到哪些已经存在的 bug 或者功能 / Related to existing bugs or features
+      description: 如果没有留空即可 / Leave blank if none
+    validations:
+      required: false
+
+  - type: textarea
+    id: details
+    attributes:
+      label: 具体功能需要 / Detailed features requirements
+    validations:
+      required: true

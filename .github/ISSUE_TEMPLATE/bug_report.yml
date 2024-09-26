@@ -1,0 +1,102 @@
+name: 反馈问题 / Bug Report
+description: 反馈错误或异常行为。 / Report errors or unexpected behavior.
+labels: [ bug ]
+title: "[Bug] (describe your issue here)"
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ### Before you submit this issue, please confirm the following:
+
+        - [ ] 我已经阅读 [README](https://github.com/StickerManager/StickerSword/blob/main/README_ZH.md)
+          I have read the [README](https://github.com/StickerManager/StickerSword/blob/main/README.md)
+        - [ ] 我已经在 Issue 列表中查看并确保没有相似 Issue
+          I have searched for a similar issue in the [issues](https://github.com/StickerManager/StickerSword/issues) of this repository and I haven't found any similar issue
+  - type: input
+    attributes:
+      label: 本模块版本 / Module Version
+      description: |
+        Please enter the version of the module you are using. For example: **1.0.0**
+    validations:
+      required: true
+  - type: input
+    attributes:
+      label: 作用域 APP 与版本 / Scope APP and Version
+      description: |
+        Please enter the version of the scope APP you are using. For example: **QQ 8.9.28**, **WeChat 8.0.30**
+        If there are multiple problematic scope APPs, please use commas to separate them and fill them in order
+    validations:
+      required: true
+  - type: dropdown
+    attributes:
+      label: 安卓版本 / Android Version
+      options:
+        - 15
+        - 14
+        - 13
+        - 12L/12.1
+        - 12
+        - 11
+        - 10
+        - 9
+        - 8.1
+        - 8.0.0
+    validations:
+      required: true
+  - type: input
+    attributes:
+      label: Xposed 框架与版本 / Framework and Version
+      description: |
+        Please enter the version of the Xposed Framework you are using. For example: **LSPosed 1.9.2**
+    validations:
+      required: true
+  - type: dropdown
+    attributes:
+      label: 已经 Root / Rooted
+      options:
+        - No
+        - Yes
+    validations:
+      required: true
+  - type: input
+    attributes:
+      label: 其它启用于同一作用域 APP 的模块 / Other active modules on the same scope APP
+      description: |
+        Please enter the names and versions of other active modules on the same scope APP.
+        If no other active modules are used, please enter **None**
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: 详细描述问题 / Detailed description of the problem
+      description: |
+        Please describe the problem in detail, including the steps to reproduce the problem.
+        If you have any logs, please provide them.
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Log
+      description: |
+        如果您有任何日志，请提供它们。
+        If you have any logs, please provide them.
+      value: |
+        <details><summary>展开查看 / View</summary><pre><code>
+
+        (请将您的日志粘贴在此处 / Please paste your log here)
+
+        </code></pre></details>
+        <!-- 请将您的日志粘贴在上面的代码块中 / Please paste your log in the code block above -->
+    validations:
+      required: true
+  - type: checkboxes
+    attributes:
+      label: 再次确认 / Confirm
+      description: |
+        为了确保 issues 的质量和避免浪费不必要的时间，未勾选下方选项的 issues 将直接被关闭。
+        请一定确保你已经**勾选下方的选项**后再提交。
+        In order to ensure the quality of issues and avoid wasting unnecessary time, issues that are not checked below will be closed directly.
+        Please make sure you have **checked the options below** before submitting.
+      options:
+        - label: 我确保上述信息准确无误 / I AM SURE THE ABOVE INFORMATION IS ACCURATE AND TRUE
+          required: false
