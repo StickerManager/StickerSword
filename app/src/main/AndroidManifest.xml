@@ -15,11 +15,6 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.AppDefault"
         tools:targetApi="31">
-        <activity
-            android:name=".ui.activity.StickerListActivity"
-            android:exported="false"
-            android:label="@string/title_activity_sticker_list"
-            android:theme="@style/Theme.AppDefault" />
 
         <meta-data
             android:name="xposedmodule"

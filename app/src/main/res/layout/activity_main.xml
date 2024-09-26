@@ -119,7 +119,7 @@
                 android:alpha="0.8"
                 android:ellipsize="end"
                 android:singleLine="true"
-                android:text="Injector for Sticker Manager."
+                android:text="Inject stickers on app for Sticker Manager."
                 android:textColor="@color/white"
                 android:textSize="13sp" />
 
