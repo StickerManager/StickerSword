@@ -38,3 +38,16 @@ body:
       label: 具体功能需要 / Detailed features requirements
     validations:
       required: true
+
+  - type: checkboxes
+    id: confirm_check
+    attributes:
+      label: 再次确认 / Confirm
+      description: |
+        为了确保 issues 的质量和避免浪费不必要的时间，未勾选下方选项的 issues 将直接被关闭。
+        请一定确保你已经**勾选下方的选项**后再提交。
+        In order to ensure the quality of issues and avoid wasting unnecessary time, issues that are not checked below will be closed directly.
+        Please make sure you have **checked the options below** before submitting.
+      options:
+        - label: 我确保上述信息准确无误 / I AM SURE THE ABOVE INFORMATION IS ACCURATE AND TRUE
+          required: false

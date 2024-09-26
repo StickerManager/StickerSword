@@ -1,0 +1,33 @@
+name: Check Issues
+
+on:
+  issues:
+    types: [opened]
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v2
+
+      - name: Check confirm_check
+        id: check_confirm
+        run: |
+          ISSUE_NUMBER=$(jq -r '.issue.number' "$GITHUB_EVENT_PATH")
+          ISSUE_BODY=$(jq -r '.issue.body' "$GITHUB_EVENT_PATH")
+          if ! echo "$ISSUE_BODY" | grep -q '\[x\] 我确保上述信息准确无误'; then
+            echo "confirm_check not checked"
+            echo "::set-output name=close_issue::true"
+          else
+            echo "confirm_check checked"
+            echo "::set-output name=close_issue::false"
+          fi
+
+      - name: Close issue if confirm_check not checked
+        if: steps.check_confirm.outputs.close_issue == 'true'
+        uses: peter-evans/close-issue@v2
+        with:
+          issue-number: ${{ github.event.issue.number }}
+          comment: |
+            由于您未勾选确认选项，此issue将被自动关闭。
+            Since you did not check the confirmation option, this issue will be automatically closed.

@@ -90,6 +90,7 @@ body:
     validations:
       required: true
   - type: checkboxes
+    id: confirm_check
     attributes:
       label: 再次确认 / Confirm
       description: |
