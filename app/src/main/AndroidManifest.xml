@@ -2,6 +2,10 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+
     <application
         android:name=".application.DefaultApplication"
         android:allowBackup="true"
@@ -11,6 +15,11 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.AppDefault"
         tools:targetApi="31">
+        <activity
+            android:name=".ui.activity.StickerListActivity"
+            android:exported="false"
+            android:label="@string/title_activity_sticker_list"
+            android:theme="@style/Theme.AppDefault" />
 
         <meta-data
             android:name="xposedmodule"
@@ -29,7 +38,6 @@
             android:name=".ui.activity.MainActivity"
             android:exported="true"
             android:screenOrientation="behind">
-
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -43,7 +51,6 @@
             android:label="@string/app_name"
             android:screenOrientation="behind"
             android:targetActivity=".ui.activity.MainActivity">
-
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -51,4 +58,5 @@
             </intent-filter>
         </activity-alias>
     </application>
+
 </manifest>

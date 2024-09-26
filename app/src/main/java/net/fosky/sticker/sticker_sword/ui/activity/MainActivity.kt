@@ -3,24 +3,93 @@
 package net.fosky.sticker.sticker_sword.ui.activity
 
 import android.content.ComponentName
+import android.content.Intent
 import android.content.pm.PackageManager
+import android.net.Uri
+import android.os.Build
+import android.os.Environment
+import android.provider.Settings
+import android.widget.Toast
+import androidx.annotation.RequiresApi
 import androidx.core.view.isVisible
 import com.highcapable.yukihookapi.YukiHookAPI
 import net.fosky.sticker.sticker_sword.BuildConfig
 import net.fosky.sticker.sticker_sword.R
 import net.fosky.sticker.sticker_sword.databinding.ActivityMainBinding
 import net.fosky.sticker.sticker_sword.ui.activity.base.BaseActivity
+import net.fosky.sticker.sticker_sword.utils.factory.StickerFactory
 
 class MainActivity : BaseActivity<ActivityMainBinding>() {
+    private fun requestPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            // 先判断有没有权限
+            if (Environment.isExternalStorageManager()) {
+                onGainedPermission()
+                return
+            }
+            Toast.makeText(
+                this,
+                "请授予插件完全文件访问权限，以挂载表情贴纸~",
+                Toast.LENGTH_LONG
+            ).show()
+            @Suppress("DEPRECATION")
+            startActivityForResult(Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION).apply {
+                data = Uri.parse("package:" + this@MainActivity.packageName)
+            }, 2339)
+        }
+    }
+
+    private fun onGainedPermission() {
+        Toast.makeText(
+            this,
+            "权限获取成功，可以挂载表情贴纸啦~",
+            Toast.LENGTH_LONG
+        ).show()
+        checkData()
+    }
+
+    private fun checkData() {
+        val data = if (StickerFactory.isFileExists()) {
+            "Data read successfully"
+        } else {
+            "Data not exists, please export it in Sticker Manager"
+        }
+        runOnUiThread {
+            binding.testTextView.text = data
+        }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.R)
+    @Deprecated("Deprecated in Java")
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == 2339) {
+            if (Environment.isExternalStorageManager()) {
+                onGainedPermission()
+                return
+            }
+            Toast.makeText(
+                this,
+                "请授予插件完全文件访问权限，以读取表情贴纸列表~",
+                Toast.LENGTH_LONG
+            ).show()
+            requestPermission()
+        }
+
+    }
 
     override fun onCreate() {
         refreshModuleStatus()
+        requestPermission()
+
         binding.mainTextVersion.text = getString(R.string.module_version, BuildConfig.VERSION_NAME)
         binding.hideIconInLauncherSwitch.isChecked = isLauncherIconShowing.not()
         binding.hideIconInLauncherSwitch.setOnCheckedChangeListener { button, isChecked ->
             if (button.isPressed) hideOrShowLauncherIcon(isChecked)
         }
-        // Your code here.
+        binding.testButton.setOnClickListener {
+            checkData()
+        }
     }
 
     /**
@@ -61,7 +130,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
     private fun refreshModuleStatus() {
         binding.mainLinStatus.setBackgroundResource(
             when {
-                YukiHookAPI.Status.isModuleActive -> R.drawable.bg_green_round
+                YukiHookAPI.Status.isModuleActive -> R.drawable.bg_blue_round
                 else -> R.drawable.bg_dark_round
             }
         )
