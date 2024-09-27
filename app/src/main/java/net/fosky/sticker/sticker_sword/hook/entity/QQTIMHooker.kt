@@ -17,54 +17,23 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * This file is created by FoskyM on 2024/09/25.
+ * Idea from https://github.com/cinit/QAuxiliary/blob/main/app/src/main/java/cc/microblock/hook/DumpTelegramStickers.kt
  */
 @file:Suppress("ConstPropertyName")
 
 package net.fosky.sticker.sticker_sword.hook.entity
 
 import android.app.Activity
-import android.app.Service
-import android.content.Context
-import android.content.res.Configuration
-import android.os.Build
-import android.view.View
-import android.view.ViewGroup
-import androidx.core.app.ServiceCompat
-import androidx.fragment.app.Fragment
-import com.highcapable.yukihookapi.hook.bean.VariousClass
 import com.highcapable.yukihookapi.hook.entity.YukiBaseHooker
 import com.highcapable.yukihookapi.hook.factory.allConstructors
 import com.highcapable.yukihookapi.hook.factory.buildOf
-import com.highcapable.yukihookapi.hook.factory.classOf
 import com.highcapable.yukihookapi.hook.factory.current
-import com.highcapable.yukihookapi.hook.factory.field
-import com.highcapable.yukihookapi.hook.factory.injectModuleAppResources
 import com.highcapable.yukihookapi.hook.factory.method
-import com.highcapable.yukihookapi.hook.factory.registerModuleAppActivities
 import com.highcapable.yukihookapi.hook.log.YLog
-import com.highcapable.yukihookapi.hook.type.android.BuildClass
-import com.highcapable.yukihookapi.hook.type.android.BundleClass
-import com.highcapable.yukihookapi.hook.type.android.ContextClass
-import com.highcapable.yukihookapi.hook.type.android.IntentClass
-import com.highcapable.yukihookapi.hook.type.android.MessageClass
-import com.highcapable.yukihookapi.hook.type.java.AnyArrayClass
-import com.highcapable.yukihookapi.hook.type.java.AnyClass
-import com.highcapable.yukihookapi.hook.type.java.BooleanClass
-import com.highcapable.yukihookapi.hook.type.java.BooleanType
-import com.highcapable.yukihookapi.hook.type.java.CharSequenceClass
-import com.highcapable.yukihookapi.hook.type.java.IntClass
-import com.highcapable.yukihookapi.hook.type.java.IntType
-import com.highcapable.yukihookapi.hook.type.java.ListClass
-import com.highcapable.yukihookapi.hook.type.java.LongType
-import com.highcapable.yukihookapi.hook.type.java.StringClass
-import com.highcapable.yukihookapi.hook.type.java.StringType
-import com.highcapable.yukihookapi.hook.type.java.UnitType
 import java.util.concurrent.Executors
 import net.fosky.sticker.sticker_sword.const.PackageName
-import net.fosky.sticker.sticker_sword.hook.entity.QQTIMHooker.FavoriteEmoticonInfo
-import net.fosky.sticker.sticker_sword.hook.entity.QQTIMHooker.hook
 import net.fosky.sticker.sticker_sword.hook.entity.QQTIMHooker.lazyClassOrNull
-import net.fosky.sticker.sticker_sword.utils.factory.StickerFactory
+import net.fosky.sticker.sticker_sword.utils.factory.*
 
 abstract class ExtraEmoticon {
     //    abstract fun emoticonId(): String
@@ -155,9 +124,6 @@ class StickerManagerEmoticonProvider : ExtraEmoticonProvider() {
             panels.add(panelsMap[category.slug]!!)
         }
 
-        // restore last use sorting
-//        val db = ConfigManager.getDumpTG_LastUseEmoticonPackStore()
-//        panels.sortByDescending { db.getLongOrDefault(it.uniqueId(), 0) }
         return panels
     }
 
@@ -248,7 +214,7 @@ object QQTIMHooker : YukiBaseHooker() {
             emptyParam()
         }?.hook()?.after {
             val stackTrace = Thread.currentThread().stackTrace
-            if (stackTrace.any { it.className == "com.tencent.mobileqq.emoticonview.EmoticonReportDtHelper" && it.methodName == "addDTReport" }) {
+            if (stackTrace.any { it.className == "${PackageName.QQ}.emoticonview.EmoticonReportDtHelper" && it.methodName == "addDTReport" }) {
                 return@after
             }
 
@@ -306,13 +272,13 @@ object QQTIMHooker : YukiBaseHooker() {
 
                     pack.set("epId", epid)
                     pack.set("name", "StickerManagerExtraSticker")
-                    pack.set("type", 3, IntType)
+                    pack.set("type", 3)
                     pack.set("ipJumpUrl", "https://github.com/StickerManager/Release/")
                     pack.set("ipDetail", "SM")
-                    pack.set("valid", true, BooleanType)
-                    pack.set("status", 2, IntType)
-                    pack.set("latestVersion", 1488377358, IntType)
-                    pack.set("aio", true, BooleanType)
+                    pack.set("valid", true)
+                    pack.set("status", 2)
+                    pack.set("latestVersion", 1488377358)
+                    pack.set("aio", true)
 
                     val type = 6
                     val column = 4
@@ -367,30 +333,3 @@ object QQTIMHooker : YukiBaseHooker() {
         }
     }
 }
-
-private fun Any?.set(key: String, value: Any) {
-    this.set(key, value, value::class.java)
-}
-
-private fun Any?.set(key: String, value: Any, fieldType: Any) {
-    val instance = this ?: return
-    instance::class.java.field {
-        name = key
-//        type = fieldType
-        superClass()
-    }.get(instance).set(value)
-}
-
-private fun <T> Any?.get(key: String): Any? {
-    return this.get<Any>(key, AnyClass)
-}
-
-private fun <T> Any?.get(key: String, _type: Any): Any? {
-    val instance = this ?: return null
-    return instance::class.java.field {
-        name = key
-//        type = _type
-        superClass()
-    }.get(instance).any()
-}
-
