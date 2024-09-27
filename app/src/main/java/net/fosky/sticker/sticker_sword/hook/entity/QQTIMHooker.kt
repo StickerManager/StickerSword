@@ -188,7 +188,7 @@ object QQTIMHooker : YukiBaseHooker() {
         }?.hook()?.before {
             result = FavoriteEmoticonInfo?.method {
                 name = "getZoomDrawable"
-            }?.get()?.call(instance, args[0], args[1], 300, 300)
+            }?.get(instance)?.call(args[0], args[1], 300, 300)
         }
 
         val providers: List<ExtraEmoticonProvider> = listOf(StickerManagerEmoticonProvider())
@@ -314,7 +314,10 @@ object QQTIMHooker : YukiBaseHooker() {
                     pack.set("latestVersion", 1488377358, IntType)
                     pack.set("aio", true, BooleanType)
 
-                    val info = EmoticonPanelInfo?.buildOf(6, 4, pack) {
+                    val type = 6
+                    val column = 4
+
+                    val info = EmoticonPanelInfo?.buildOf(type, column, pack) {
                         paramCount = 3
                     }
 

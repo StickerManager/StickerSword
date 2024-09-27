@@ -45,7 +45,7 @@ data class StickerCategory (
 )
 
 object StickerFactory {
-    val stickerManagerDataPath = "/storage/self/primary/Pictures/net.fosky.sticker.sticker_manager/data/export/data.json.svg"
+    val stickerManagerDataPath = "/storage/self/primary/Pictures/net.fosky.sticker.sticker_manager/data/export/data.json"
 
     fun isFileExists(): Boolean {
         val file = File(stickerManagerDataPath)
