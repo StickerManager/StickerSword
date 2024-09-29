@@ -24,16 +24,30 @@
 package net.fosky.sticker.sticker_sword.hook.entity
 
 import android.app.Activity
+import android.Manifest
+import android.content.Intent
+import android.content.pm.PackageManager
+import android.net.Uri
+import android.os.Build
+import android.os.Environment
+import android.provider.Settings
+import androidx.annotation.RequiresApi
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import com.highcapable.yukihookapi.hook.entity.YukiBaseHooker
 import com.highcapable.yukihookapi.hook.factory.allConstructors
 import com.highcapable.yukihookapi.hook.factory.buildOf
 import com.highcapable.yukihookapi.hook.factory.current
 import com.highcapable.yukihookapi.hook.factory.method
 import com.highcapable.yukihookapi.hook.log.YLog
-import java.util.concurrent.Executors
+import de.robv.android.xposed.XC_MethodHook
+import de.robv.android.xposed.XposedHelpers
+import de.robv.android.xposed.XposedHelpers.getObjectField
 import net.fosky.sticker.sticker_sword.const.PackageName
 import net.fosky.sticker.sticker_sword.hook.entity.QQTIMHooker.lazyClassOrNull
 import net.fosky.sticker.sticker_sword.utils.factory.*
+import java.util.concurrent.Executors
+
 
 abstract class ExtraEmoticon {
     //    abstract fun emoticonId(): String
@@ -143,10 +157,6 @@ object QQTIMHooker : YukiBaseHooker() {
 
     private val isQQ get() = packageName == PackageName.QQ
     private var hostVersionName = "<unknown>"
-
-    private fun Any.compatToActivity() =
-        if (this is Activity) this else current().method { name = "getActivity"; superClass() }
-            .invoke()
 
     private fun hookEmoticon() {
         FavoriteEmoticonInfo?.method {
@@ -328,6 +338,10 @@ object QQTIMHooker : YukiBaseHooker() {
     }
 
     override fun onHook() {
+        val _splashActivity by lazyClassOrNull("${PackageName.QQ}.activity.SplashActivity")
+        if (_splashActivity != null) {
+            hookGrantFilesAccessPermission(_splashActivity!!, PackageName.QQ)
+        }
         withProcess(mainProcessName) {
             hookEmoticon()
         }

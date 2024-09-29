@@ -29,12 +29,16 @@ import com.highcapable.yukihookapi.hook.factory.configs
 import com.highcapable.yukihookapi.hook.factory.encase
 import com.highcapable.yukihookapi.hook.factory.field
 import com.highcapable.yukihookapi.hook.factory.method
+import com.highcapable.yukihookapi.hook.log.YLog
+import com.highcapable.yukihookapi.hook.type.android.ApplicationInfoClass
 import com.highcapable.yukihookapi.hook.type.android.BundleClass
+import com.highcapable.yukihookapi.hook.type.android.PackageInfoClass
 import com.highcapable.yukihookapi.hook.type.java.StringClass
 import com.highcapable.yukihookapi.hook.xposed.proxy.IYukiHookXposedInit
 import net.fosky.sticker.sticker_sword.R
 import net.fosky.sticker.sticker_sword.const.PackageName
 import net.fosky.sticker.sticker_sword.hook.entity.*
+import net.fosky.sticker.sticker_sword.hook.permission.PermissionGrantHooker
 
 @InjectYukiHookWithXposed
 class HookEntry : IYukiHookXposedInit {
@@ -48,6 +52,10 @@ class HookEntry : IYukiHookXposedInit {
     }
 
     override fun onHook() = encase {
+        loadSystem {
+            loadHooker(PermissionGrantHooker)
+        }
+
         loadApp(PackageName.QQ, PackageName.TIM) { loadHooker(QQTIMHooker) }
         loadApp(PackageName.WECHAT) { loadHooker(WechatHooker) }
     }
