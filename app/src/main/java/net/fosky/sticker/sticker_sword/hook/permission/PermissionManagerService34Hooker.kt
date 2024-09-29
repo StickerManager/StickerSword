@@ -1,5 +1,5 @@
 /*
- * Sticker Sword -Inject stickers on app for Sticker Manager.
+ * Sticker Sword - Inject stickers on app for Sticker Manager.
  * Copyright (C) 2024 FoskyM<i@fosky.top>
  * https://github.com/StickerManager/StickerSword
  *
