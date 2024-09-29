@@ -36,10 +36,14 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.highcapable.yukihookapi.hook.entity.YukiBaseHooker
 import com.highcapable.yukihookapi.hook.factory.allConstructors
+import com.highcapable.yukihookapi.hook.factory.allMethods
 import com.highcapable.yukihookapi.hook.factory.buildOf
+import com.highcapable.yukihookapi.hook.factory.constructor
 import com.highcapable.yukihookapi.hook.factory.current
+import com.highcapable.yukihookapi.hook.factory.field
 import com.highcapable.yukihookapi.hook.factory.method
 import com.highcapable.yukihookapi.hook.log.YLog
+import com.highcapable.yukihookapi.hook.type.java.StringClass
 import de.robv.android.xposed.XC_MethodHook
 import de.robv.android.xposed.XposedHelpers
 import de.robv.android.xposed.XposedHelpers.getObjectField
@@ -71,6 +75,27 @@ val executor = Executors.newFixedThreadPool(2)
 class StickerManagerEmoticonProvider : ExtraEmoticonProvider() {
     class Panel(val id: String, val slug: String, val name: String) : ExtraEmoticonPanel() {
         val FavoriteEmoticonInfo by lazyClassOrNull("${PackageName.QQ}.emoticonview.FavoriteEmoticonInfo")
+        val PicEmoticonInfo by lazyClassOrNull("${PackageName.QQ}.emoticonview.PicEmoticonInfo")
+        val Emoticon by lazyClassOrNull("${PackageName.QQ}.data.Emoticon")
+//        val emoticon = first?.get<Any>("emoticon")
+////                    val imageType = first?.get<Any>("imageType")//3
+////                    val mDefault = first?.get<Any>("mDefault")
+////                    val mEmptyDrawable = first?.get<Any>("mEmptyDrawable")
+////                    val mFailed = first?.get<Any>("mFailed")
+////                    val uin = first?.get<Any>("uin")
+//
+//        //YLog.info("getEmotionPanelData: $emoticon, $imageType, $isAPNG, $isDownLoad, $mDefault, $mEmptyDrawable, $mFailed, $mFiveInchDefault, $mFiveInchFailed, $reqHeight, $reqWidth, $roamingType, $uin")
+//
+//        val eId = emoticon?.get<Any>("eId")//md5?
+//        val encryptKey = emoticon?.get<Any>("encryptKey")//?
+//        val epId = emoticon?.get<Any>("epId")//id
+//        val extensionHeight = emoticon?.get<Any>("extensionHeight")//300
+//        val extensionWidth = emoticon?.get<Any>("extensionWidth")//300
+//        val height = emoticon?.get<Any>("height")//200
+//        val keywords = emoticon?.get<Any>("keywords")//["XXXX"]
+//        val name = emoticon?.get<Any>("name")//name
+//        val width = emoticon?.get<Any>("width")//200
+
         private var emoticons: List<ExtraEmoticon> = listOf()
         private var iconPath: String? = null
         private fun updateEmoticons() {
@@ -79,16 +104,38 @@ class StickerManagerEmoticonProvider : ExtraEmoticonProvider() {
 
             for (sticker in stickers) {
                 emoticons.add(object : ExtraEmoticon() {
-                    val info = FavoriteEmoticonInfo?.buildOf()
+//                    val info = FavoriteEmoticonInfo?.buildOf()
+//
+//                    init {
+//                        info.set("path", sticker.path)
+//                        info.set("remark", sticker.notes)
+//                        info.set("actionData", "${uniqueId()}:${sticker.path}")
+//                    }
+val _info = PicEmoticonInfo?.buildOf("uin") {
+    param(StringClass)
+}
+                    val _emoticon = Emoticon?.buildOf()
 
                     init {
-                        info.set("path", sticker.path)
-                        info.set("remark", sticker.notes)
-                        info.set("actionData", "${uniqueId()}:${sticker.path}")
+                        _emoticon?.set("eId", sticker.path)
+                        _emoticon?.set("epId", "ss:${sticker.id}")
+                        _emoticon?.set("encryptKey", "")
+                        _emoticon?.set("extensionHeight", 300)
+                        _emoticon?.set("extensionWidth", 300)
+                        _emoticon?.set("height", 200)
+                        _emoticon?.set("width", 200)
+                        _emoticon?.set("keywords", "[\"${sticker.notes}\"]")
+                        _emoticon?.set("name", sticker.notes)
+
+                        if (_emoticon != null) {
+                            _info?.set("emoticon", _emoticon)
+                        }
+
+                        _info?.set("imageType", 3)
                     }
 
                     override fun QQEmoticonObject(): Any? {
-                        return info
+                        return _info
                     }
                 })
             }
@@ -153,18 +200,23 @@ object QQTIMHooker : YukiBaseHooker() {
     val EmoticonTabAdapter by lazyClassOrNull("${PackageName.QQ}.emoticonview.EmoticonTabAdapter")
     val EmoticonPanelInfo by lazyClassOrNull("${PackageName.QQ}.emoticonview.EmotionPanelInfo")
     val EmoticonPackage by lazyClassOrNull("${PackageName.QQ}.data.EmoticonPackage")
-    val FavoriteEmoticonInfo by lazyClassOrNull("${PackageName.QQ}.emoticonview.FavoriteEmoticonInfo")
+    val PicEmoticonInfo by lazyClassOrNull("${PackageName.QQ}.emoticonview.PicEmoticonInfo")
 
     private val isQQ get() = packageName == PackageName.QQ
     private var hostVersionName = "<unknown>"
 
     private fun hookEmoticon() {
-        FavoriteEmoticonInfo?.method {
-            name = "getDrawable"
+        PicEmoticonInfo?.method {
+            name = "getPanelImageURL"
         }?.hook()?.before {
-            result = FavoriteEmoticonInfo?.method {
-                name = "getZoomDrawable"
-            }?.get(instance)?.call(args[0], args[1], 300, 300)
+            val emoticon = PicEmoticonInfo?.field {
+                name = "emoticon"
+            }?.get(instance)?.any()
+            val epId = emoticon?.get<Any>("epId") as String
+            if (epId.startsWith("ss:")) {
+                val path = emoticon.get<String>("eId")
+                result = java.net.URL("file://$path")
+            }
         }
 
         val providers: List<ExtraEmoticonProvider> = listOf(StickerManagerEmoticonProvider())

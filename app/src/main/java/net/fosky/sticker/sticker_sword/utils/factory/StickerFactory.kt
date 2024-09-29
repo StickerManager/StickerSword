@@ -86,7 +86,7 @@ object StickerFactory {
                 stickerCategories.add(stickerCategory)
             }
 
-            YLog.info("StickerManager data file loaded. ${stickerCategories.size} categories found")
+//            YLog.info("StickerManager data file loaded. ${stickerCategories.size} categories found")
         } else {
             YLog.error("StickerManager data file not found")
         }
@@ -96,6 +96,10 @@ object StickerFactory {
 
     fun getStickersByCategorySlug(slug: String) : List<Sticker> {
         return getAllStickersByCategory().find { it.slug == slug }?.stickers ?: listOf()
+    }
+
+    fun getStickerById(id: String) : Sticker? {
+        return getAllStickersByCategory().flatMap { it.stickers }.find { it.id == id }
     }
 
 }
