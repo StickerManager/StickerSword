@@ -23,30 +23,17 @@
 
 package net.fosky.sticker.sticker_sword.hook.entity
 
-import android.app.Activity
-import android.Manifest
-import android.content.Intent
-import android.content.pm.PackageManager
-import android.net.Uri
-import android.os.Build
-import android.os.Environment
-import android.provider.Settings
-import androidx.annotation.RequiresApi
-import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
+import android.view.View;
+import android.widget.TextView
 import com.highcapable.yukihookapi.hook.entity.YukiBaseHooker
 import com.highcapable.yukihookapi.hook.factory.allConstructors
+import com.highcapable.yukihookapi.hook.factory.allFields
 import com.highcapable.yukihookapi.hook.factory.allMethods
 import com.highcapable.yukihookapi.hook.factory.buildOf
-import com.highcapable.yukihookapi.hook.factory.constructor
-import com.highcapable.yukihookapi.hook.factory.current
 import com.highcapable.yukihookapi.hook.factory.field
 import com.highcapable.yukihookapi.hook.factory.method
 import com.highcapable.yukihookapi.hook.log.YLog
 import com.highcapable.yukihookapi.hook.type.java.StringClass
-import de.robv.android.xposed.XC_MethodHook
-import de.robv.android.xposed.XposedHelpers
-import de.robv.android.xposed.XposedHelpers.getObjectField
 import net.fosky.sticker.sticker_sword.const.PackageName
 import net.fosky.sticker.sticker_sword.hook.entity.QQTIMHooker.lazyClassOrNull
 import net.fosky.sticker.sticker_sword.utils.factory.*
@@ -77,24 +64,6 @@ class StickerManagerEmoticonProvider : ExtraEmoticonProvider() {
         val FavoriteEmoticonInfo by lazyClassOrNull("${PackageName.QQ}.emoticonview.FavoriteEmoticonInfo")
         val PicEmoticonInfo by lazyClassOrNull("${PackageName.QQ}.emoticonview.PicEmoticonInfo")
         val Emoticon by lazyClassOrNull("${PackageName.QQ}.data.Emoticon")
-//        val emoticon = first?.get<Any>("emoticon")
-////                    val imageType = first?.get<Any>("imageType")//3
-////                    val mDefault = first?.get<Any>("mDefault")
-////                    val mEmptyDrawable = first?.get<Any>("mEmptyDrawable")
-////                    val mFailed = first?.get<Any>("mFailed")
-////                    val uin = first?.get<Any>("uin")
-//
-//        //YLog.info("getEmotionPanelData: $emoticon, $imageType, $isAPNG, $isDownLoad, $mDefault, $mEmptyDrawable, $mFailed, $mFiveInchDefault, $mFiveInchFailed, $reqHeight, $reqWidth, $roamingType, $uin")
-//
-//        val eId = emoticon?.get<Any>("eId")//md5?
-//        val encryptKey = emoticon?.get<Any>("encryptKey")//?
-//        val epId = emoticon?.get<Any>("epId")//id
-//        val extensionHeight = emoticon?.get<Any>("extensionHeight")//300
-//        val extensionWidth = emoticon?.get<Any>("extensionWidth")//300
-//        val height = emoticon?.get<Any>("height")//200
-//        val keywords = emoticon?.get<Any>("keywords")//["XXXX"]
-//        val name = emoticon?.get<Any>("name")//name
-//        val width = emoticon?.get<Any>("width")//200
 
         private var emoticons: List<ExtraEmoticon> = listOf()
         private var iconPath: String? = null
@@ -104,35 +73,40 @@ class StickerManagerEmoticonProvider : ExtraEmoticonProvider() {
 
             for (sticker in stickers) {
                 emoticons.add(object : ExtraEmoticon() {
-//                    val info = FavoriteEmoticonInfo?.buildOf()
-//
-//                    init {
-//                        info.set("path", sticker.path)
-//                        info.set("remark", sticker.notes)
-//                        info.set("actionData", "${uniqueId()}:${sticker.path}")
-//                    }
-val _info = PicEmoticonInfo?.buildOf("uin") {
-    param(StringClass)
-}
-                    val _emoticon = Emoticon?.buildOf()
+                    val _info = FavoriteEmoticonInfo?.buildOf()
 
                     init {
-                        _emoticon?.set("eId", sticker.path)
-                        _emoticon?.set("epId", "ss:${sticker.id}")
-                        _emoticon?.set("encryptKey", "")
-                        _emoticon?.set("extensionHeight", 300)
-                        _emoticon?.set("extensionWidth", 300)
-                        _emoticon?.set("height", 200)
-                        _emoticon?.set("width", 200)
-                        _emoticon?.set("keywords", "[\"${sticker.notes}\"]")
-                        _emoticon?.set("name", sticker.notes)
-
-                        if (_emoticon != null) {
-                            _info?.set("emoticon", _emoticon)
-                        }
-
-                        _info?.set("imageType", 3)
+                        _info.set("path", sticker.path)
+                        _info.set("actionData", "${uniqueId()}:${sticker.path}")
                     }
+                    // 很怪的事情，过了一晚上就无法发送用 PicEmoticonInfo 增加的表情，疑似云控了？调试好久没找到哪里有做检测
+                    // com.tencent.mobileqq.emoticonview.QQEmoticonPanelLinearLayoutHelper -> performClick
+                    // 理论上下一步会调用 com.tencent.qqnt.aio.adapter.emoticon.NTEmoticonPanelProvider -> send
+                    // 但是只执行了 -> d, -> onResume, -> onPause
+                    // 不知道是不是在这之前有个校验啥的，没找到，先扔着了
+
+//                    val _info = PicEmoticonInfo?.buildOf("uin") {
+//                        param(StringClass)
+//                    }
+//                    val _emoticon = Emoticon?.buildOf()
+//
+//                    init {
+//                        _emoticon?.set("eId", sticker.path)
+//                        _emoticon?.set("epId", "ss:${sticker.id}")
+//                        _emoticon?.set("encryptKey", "")
+//                        _emoticon?.set("extensionHeight", 300)
+//                        _emoticon?.set("extensionWidth", 300)
+//                        _emoticon?.set("height", 200)
+//                        _emoticon?.set("width", 200)
+//                        _emoticon?.set("keywords", "[\"${sticker.notes}\"]")
+//                        _emoticon?.set("name", sticker.notes)
+//
+//                        if (_emoticon != null) {
+//                            _info?.set("emoticon", _emoticon)
+//                        }
+//
+//                        _info?.set("imageType", 3)
+//                    }
 
                     override fun QQEmoticonObject(): Any? {
                         return _info
@@ -201,23 +175,81 @@ object QQTIMHooker : YukiBaseHooker() {
     val EmoticonPanelInfo by lazyClassOrNull("${PackageName.QQ}.emoticonview.EmotionPanelInfo")
     val EmoticonPackage by lazyClassOrNull("${PackageName.QQ}.data.EmoticonPackage")
     val PicEmoticonInfo by lazyClassOrNull("${PackageName.QQ}.emoticonview.PicEmoticonInfo")
+    val URLDrawable by lazyClassOrNull("com.tencent.image.URLDrawable")
+    val URLDrawableOptionsClassName = "com.tencent.image.URLDrawable\$URLDrawableOptions"
+    val URLDrawableOptions by lazyClassOrNull(URLDrawableOptionsClassName)
 
     private val isQQ get() = packageName == PackageName.QQ
     private var hostVersionName = "<unknown>"
 
     private fun hookEmoticon() {
-        PicEmoticonInfo?.method {
-            name = "getPanelImageURL"
-        }?.hook()?.before {
-            val emoticon = PicEmoticonInfo?.field {
-                name = "emoticon"
-            }?.get(instance)?.any()
-            val epId = emoticon?.get<Any>("epId") as String
-            if (epId.startsWith("ss:")) {
-                val path = emoticon.get<String>("eId")
-                result = java.net.URL("file://$path")
-            }
-        }
+        // 既然暂时无法用 PicEmoticonInfo 增加表情，那这段也先注释了
+//        PicEmoticonInfo?.apply {
+//            method {
+//                name = "getPanelImageURL"
+//            }.hook().before {
+//                val emoticon = PicEmoticonInfo?.field {
+//                    name = "emoticon"
+//                }?.get(instance)?.any()
+//                val epId = emoticon?.get<Any>("epId") as String
+//                if (epId.startsWith("ss:")) {
+//                    val path = emoticon.get<String>("eId")
+//                    result = java.net.URL("file://$path")
+//                }
+//            }
+//            // 修复长按预览表情无法加载
+//            method {
+//                name = "getPicEmoticonLoadingDrawable"
+//                paramCount = 7
+//            }.hook().after {
+//                val emoticon = PicEmoticonInfo?.field {
+//                    name = "emoticon"
+//                }?.get(instance)?.any()
+//                val epId = emoticon?.get<Any>("epId") as String
+//                if (epId.startsWith("ss:")) {
+//                    val obj = args[0]
+//                    val path = emoticon.get<String>("eId")
+//                    val url = java.net.URL("file://$path")
+//
+//                    val uRLDrawableO = URLDrawableOptions?.method {
+//                        name = "obtain"
+//                    }?.get()?.call()
+//                    obj.get<Any>("mFailed")?.let { uRLDrawableO.set("mFailedDrawable", it) }
+//                    obj.get<Any>("mDefault")?.let { uRLDrawableO.set("mLoadingDrawable", it) }
+//                    obj.get<Any>("reqWidth")?.let { uRLDrawableO.set("mRequestWidth", it) }
+//                    obj.get<Any>("reqHeight")?.let { uRLDrawableO.set("mRequestHeight", it) }
+//
+//                    uRLDrawableO.set("mPlayGifImage", true)
+//                    uRLDrawableO.set("mGifRefreshDelay", 0)
+//
+//                    val drawable = URLDrawable?.method {
+//                        name = "getDrawable"
+//                        param("java.net.URL", URLDrawableOptionsClassName)
+//                    }?.get()?.call(url, uRLDrawableO)
+//                    YLog.debug("getPicEmoticonLoadingDrawable: $drawable")
+//                    URLDrawable?.apply {
+//                        method {
+//                            name = "setTag"
+//                            paramCount = 1
+//                        }.get(drawable).call(emoticon)
+//                        method {
+//                            name = "addHeader"
+//                            paramCount = 2
+//                        }.get(drawable).call("my_uin", obj.get<Any>("uin") as String)
+//                        method {
+//                            name = "addHeader"
+//                            paramCount = 2
+//                        }.get(drawable).call("emo_type", obj.get<Any>("imageType").toString())
+//                        val p3 = args[3] as Boolean
+//                        method {
+//                            name = "addHeader"
+//                            paramCount = 2
+//                        }.get(drawable).call("2g_use_gif", if (p3) "true" else "false")
+//                    }
+//                    result = drawable
+//                }
+//            }
+//        }
 
         val providers: List<ExtraEmoticonProvider> = listOf(StickerManagerEmoticonProvider())
 
