@@ -14,8 +14,8 @@ Inject stickers on app for Sticker Manager.
 
 2. 通过 `Sticker Sword` 挂载贴纸数据
     1. 下载
-    2. 在框架中设置作用域
-    3. 重启目标应用
+    2. 在框架中设置作用域（系统框架必须勾选，否则无法读取贴纸信息）
+    3. 重启系统以获取权限
 
 ### 请勿用于非法用途
 
@@ -37,7 +37,10 @@ Inject stickers on app for Sticker Manager.
 
 ```kotlin
     override fun onHook() = encase {
+        loadSystem { loadHooker(PermissionGrantHooker) }
+    
         loadApp(PackageName.QQ, PackageName.TIM) { loadHooker(QQTIMHooker) }
+        loadApp(PackageName.WECHAT) { loadHooker(WechatHooker) }
 
         // 增加你的加载部分
         // loadApp(PackageName.XXX) { loadHooker(XXXHooker) }

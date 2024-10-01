@@ -14,8 +14,8 @@ English | [中文文档](https://github.com/StickerManager/StickerSword/blob/mai
 
 2. Mount data by `Sticker Sword`
     1. Download
-    2. Set the scope in LSPosed/Xposed and more.
-    3. Restart target app.
+    2. Set the scope in LSPosed/Xposed and more (system should be included or stickers will be unable to load).
+    3. Restart system to hook permission.
 
 ## Development
 
@@ -31,7 +31,10 @@ English | [中文文档](https://github.com/StickerManager/StickerSword/blob/mai
 
 ```kotlin
     override fun onHook() = encase {
+        loadSystem { loadHooker(PermissionGrantHooker) }
+    
         loadApp(PackageName.QQ, PackageName.TIM) { loadHooker(QQTIMHooker) }
+        loadApp(PackageName.WECHAT) { loadHooker(WechatHooker) }
 
         // Add your hook loader
         // loadApp(PackageName.XXX) { loadHooker(XXXHooker) }
