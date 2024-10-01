@@ -4,5 +4,6 @@
         <item>android</item>
         <item>net.fosky.sticker.sticker_manager</item>
         <item>com.tencent.mobileqq</item>
+        <item>com.tencent.mm</item>
     </string-array>
 </resources>
